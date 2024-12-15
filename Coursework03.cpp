@@ -321,7 +321,7 @@ int main(int argc, char** argv)
 
 		// print the vertices of modelRing
 		glm::mat4 modelRing = glm::mat4(1.f);
-		modelRing = glm::translate(modelRing, glm::vec3(0.0f, 1.2f, 0.0f)); // Translate the ring above the cone
+		modelRing = glm::translate(modelRing, glm::vec3(0.0f, .5f, 0.0f)); // Translate the ring above the cone
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
 
         glBindVertexArray(VAO[1]);
@@ -334,7 +334,7 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		glm::mat4 projection = glm::mat4(1.f);
-		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, 1.f, 10.f);
+		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, 1.f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		
 		glfwSwapBuffers(window);
