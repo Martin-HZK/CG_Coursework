@@ -19,7 +19,7 @@
 // 圆锥参数
 const float radius = 0.5f; // 底面半径
 const float height = 1.0f; // 高度
-const int segments = 36;   // 圆的分段数
+const int segments_cone = 36;   // 圆的分段数
 
 std::vector<float> coneVertices;
 
@@ -34,8 +34,8 @@ void generateConeVertices() {
 	coneVertices.push_back(1.0f); // b
 
 	// 底面顶点
-	for (int i = 0; i <= segments; ++i) {
-		float theta = 2.0f * M_PI * i / segments;
+	for (int i = 0; i <= segments_cone; ++i) {
+		float theta = 2.0f * M_PI * i / segments_cone;
 		float x = radius * cos(theta);
 		float z = radius * sin(theta);
 		coneVertices.push_back(x); // x
@@ -47,8 +47,8 @@ void generateConeVertices() {
 	}
 
 	// 侧面顶点
-	for (int i = 0; i <= segments; ++i) {
-		float theta = 2.0f * M_PI * i / segments;
+	for (int i = 0; i <= segments_cone; ++i) {
+		float theta = 2.0f * M_PI * i / segments_cone;
 		float x = radius * cos(theta);
 		float z = radius * sin(theta);
 
@@ -69,6 +69,50 @@ void generateConeVertices() {
 		coneVertices.push_back(0.0f);
 	}
 }
+
+const float innerRadius = 0.3f;
+const float outerRadius = 0.5f;
+const int segments_ring = 10000;
+const int verticalSegments = 10; // 垂直方向的分段数
+
+std::vector<float> ringVertices;
+
+void generateRingVertices() {
+	const float thickness = 0.1f; // 定义 ring 的厚度
+
+	for (int i = 0; i <= segments_ring; ++i) {
+		float theta = 2.0f * M_PI * i / segments_ring;
+		float xInner = innerRadius * cos(theta);
+		float zInner = innerRadius * sin(theta);
+		float xOuter = outerRadius * cos(theta);
+		float zOuter = outerRadius * sin(theta);
+
+		for (int j = 0; j <= verticalSegments; ++j) {
+			float y = -thickness / 2 + (thickness * j / verticalSegments);
+			float color = static_cast<float>(j) / verticalSegments;
+
+			// 内边缘顶点
+			ringVertices.push_back(xInner); // x
+			ringVertices.push_back(y);      // y
+			ringVertices.push_back(zInner); // z
+			ringVertices.push_back(0.0f);   // r
+			ringVertices.push_back(1.0f - color); // g
+			ringVertices.push_back(0.0f);   // b
+
+			// 外边缘顶点
+			ringVertices.push_back(xOuter); // x
+			ringVertices.push_back(y);      // y
+			ringVertices.push_back(zOuter); // z
+			ringVertices.push_back(0.0f);   // r
+			ringVertices.push_back(0.0f);   // g
+			ringVertices.push_back(1.0f - color); // b
+		}
+	}
+}
+
+
+
+
 
 
 
@@ -190,28 +234,31 @@ int main(int argc, char** argv)
 
 // generate cone vertex
 	generateConeVertices();
+	generateRingVertices();
 
 
+	unsigned int VAO[2];
+	glGenVertexArrays(1, &VAO[0]);
+	glGenVertexArrays(1, &VAO[1]);
+	unsigned int VBO[2];
+	glGenBuffers(1, &VBO[0]);
+	glGenBuffers(1, &VBO[1]);
 
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
 
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindVertexArray(VAO[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);*/
 	// print the cone vertices
-	for (int i = 0; i < coneVertices.size(); i++)
+	/*for (int i = 0; i < coneVertices.size(); i++)
 	{
 		std::cout << coneVertices[i] << " ";
 		if ((i + 1) % 6 == 0)
 			std::cout << std::endl;
-	}
+	}*/
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * coneVertices.size(), &coneVertices[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -223,6 +270,26 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
+	/*glBindVertexArray(VAO[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ringVertices.size(), &ringVertices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);*/
+	glBindVertexArray(VAO[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ringVertices.size(), &ringVertices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -238,10 +305,28 @@ int main(int argc, char** argv)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
-		glm::mat4 model = glm::mat4(1.f);
+		/*glm::mat4 model = glm::mat4(1.f);
 		model = glm::translate(model, cube_pos);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		
+		*/
+		// Render the cone
+		glm::mat4 modelCone = glm::mat4(1.f);
+		modelCone = glm::translate(modelCone, cube_pos);
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelCone));
+
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, segments_cone + 2);
+		glDrawArrays(GL_TRIANGLE_STRIP, segments_cone + 2, (segments_cone + 1) * 2);
+		glBindVertexArray(0);
+
+		// print the vertices of modelRing
+		glm::mat4 modelRing = glm::mat4(1.f);
+		modelRing = glm::translate(modelRing, glm::vec3(0.0f, 1.2f, 0.0f)); // Translate the ring above the cone
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
+
+        glBindVertexArray(VAO[1]);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, (segments_ring + 1) * (verticalSegments + 1) * 2);
+        glBindVertexArray(0);
 
 		glm::mat4 view = glm::mat4(1.f);
 		//view = glm::translate(view, -glm::vec3(0.f, 0.f, 3.f));
@@ -251,13 +336,7 @@ int main(int argc, char** argv)
 		glm::mat4 projection = glm::mat4(1.f);
 		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, 1.f, 10.f);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-
-		glBindVertexArray(VAO);
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		glDrawArrays(GL_TRIANGLE_FAN, 0, segments + 2);
-		glDrawArrays(GL_TRIANGLE_STRIP, segments + 2, (segments + 1) * 2);
-		glBindVertexArray(0);
-
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

@@ -1,1 +1,8 @@
-﻿  Coursework03.vcxproj -> C:\Y4\Computer Graphics\Coursework03\x64\Debug\Coursework03.exe
+﻿  Coursework03.cpp
+C:\Y4\Computer Graphics\Coursework03\util.h(17,11): warning C4267: 'initializing': conversion from 'size_t' to 'long', possible loss of data
+  (compiling source file 'Coursework03.cpp')
+  
+C:\Y4\Computer Graphics\Coursework03\Coursework03.cpp(38,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Y4\Computer Graphics\Coursework03\Coursework03.cpp(51,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Y4\Computer Graphics\Coursework03\Coursework03.cpp(84,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Coursework03.vcxproj -> C:\Y4\Computer Graphics\Coursework03\x64\Debug\Coursework03.exe
