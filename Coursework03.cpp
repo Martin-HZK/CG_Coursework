@@ -29,6 +29,9 @@ void generateConeVertices() {
 	coneVertices.push_back(1.0f); // r
 	coneVertices.push_back(1.0f); // g
 	coneVertices.push_back(1.0f); // b
+	coneVertices.push_back(0.0f); // nx
+	coneVertices.push_back(-1.0f); // ny
+	coneVertices.push_back(0.0f); // nz
 
 	// 底面顶点
 	for (int i = 0; i <= segments_cone; ++i) {
@@ -41,6 +44,9 @@ void generateConeVertices() {
 		coneVertices.push_back(0.0f); // r
 		coneVertices.push_back(1.0f); // g
 		coneVertices.push_back(0.0f); // b
+		coneVertices.push_back(0.0f); // nx
+		coneVertices.push_back(-1.0f); // ny
+		coneVertices.push_back(0.0f); // nz
 	}
 
 	// 侧面顶点
@@ -48,6 +54,9 @@ void generateConeVertices() {
 		float theta = 2.0f * M_PI * i / segments_cone;
 		float x = radius * cos(theta);
 		float z = radius * sin(theta);
+		float nx = cos(theta);
+		float nz = sin(theta);
+		float ny = radius / height;
 
 		// 底部顶点
 		coneVertices.push_back(x);
@@ -56,6 +65,9 @@ void generateConeVertices() {
 		coneVertices.push_back(0.0f);
 		coneVertices.push_back(0.0f);
 		coneVertices.push_back(1.0f);
+		coneVertices.push_back(nx);
+		coneVertices.push_back(ny);
+		coneVertices.push_back(nz);
 
 		// 锥顶点
 		coneVertices.push_back(0.0f);
@@ -64,6 +76,9 @@ void generateConeVertices() {
 		coneVertices.push_back(1.0f);
 		coneVertices.push_back(0.0f);
 		coneVertices.push_back(0.0f);
+		coneVertices.push_back(nx);
+		coneVertices.push_back(ny);
+		coneVertices.push_back(nz);
 	}
 }
 
@@ -93,12 +108,20 @@ void generateRingVertices() {
 			float rotatedX = (innerRadius + outerRadius) / 2.0f * cosTheta + x * cosTheta - z * sinTheta;
 			float rotatedY = (innerRadius + outerRadius) / 2.0f * sinTheta + x * sinTheta + z * cosTheta;
 
+			// 计算法线
+			float nx = cosPhi * cosTheta;
+			float ny = sinPhi;
+			float nz = cosPhi * sinTheta;
+
 			ringVertices.push_back(rotatedX); // x
 			ringVertices.push_back(y);        // y
 			ringVertices.push_back(rotatedY); // z
 			ringVertices.push_back(0.0f);     // r
 			ringVertices.push_back(1.0f);     // g
 			ringVertices.push_back(0.0f);     // b
+			ringVertices.push_back(nx);       // nx
+			ringVertices.push_back(ny);       // ny
+			ringVertices.push_back(nz);       // nz
 		}
 	}
 }
@@ -120,18 +143,29 @@ void generateSphereVertices() {
 			float x = sphereRadius * sin(theta) * cos(phi);
 			float y = sphereRadius * cos(theta);
 			float z = sphereRadius * sin(theta) * sin(phi);
+
+			// 计算法线
+			float nx = x / sphereRadius;
+			float ny = y / sphereRadius;
+			float nz = z / sphereRadius;
+
 			sphereVertices.push_back(x);
 			sphereVertices.push_back(y);
 			sphereVertices.push_back(z);
 			sphereVertices.push_back(1.0f); // r
 			sphereVertices.push_back(1.0f); // g
 			sphereVertices.push_back(0.0f); // b
+			sphereVertices.push_back(nx);   // nx
+			sphereVertices.push_back(ny);   // ny
+			sphereVertices.push_back(nz);   // nz
 		}
 	}
 }
 
 
 glm::vec3 cube_pos = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
+glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
 
 SCamera Camera;
 
@@ -140,6 +174,11 @@ void processKeyboard(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		lightDirection = Camera.Front;
+	}
 
 	bool cam_changed = false;
 	float x = 0.f, y = 0.f;
@@ -214,25 +253,13 @@ int main(int argc, char** argv)
 
 	glBindVertexArray(VAO[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);*/
-	// print the cone vertices
-	/*for (int i = 0; i < coneVertices.size(); i++)
-	{
-		std::cout << coneVertices[i] << " ";
-		if ((i + 1) % 6 == 0)
-			std::cout << std::endl;
-	}*/
-
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * coneVertices.size(), &coneVertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
@@ -240,10 +267,12 @@ int main(int argc, char** argv)
 	glBindVertexArray(VAO[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ringVertices.size(), &ringVertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -271,6 +300,9 @@ int main(int argc, char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+		glUniform3f(glGetUniformLocation(shaderProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
+		glUniform3f(glGetUniformLocation(shaderProgram, "lightColour"), 0.f, 0.f, 1.f);
+		glUniform3f(glGetUniformLocation(shaderProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
 
 		/*glm::mat4 model = glm::mat4(1.f);
 		model = glm::translate(model, cube_pos);
