@@ -10,9 +10,6 @@
 #include "camera.h"
 #include "shader.h"
 #include "window.h"
-
-//#include <cmath>
-//#include <math.h>
 #include <corecrt_math_defines.h>
 #include <vector>
 
@@ -73,103 +70,70 @@ void generateConeVertices() {
 const float innerRadius = 0.3f;
 const float outerRadius = 0.5f;
 const int segments_ring = 10000;
-const int verticalSegments = 10; // 垂直方向的分段数
+const int segments_circle = 36; // 圆形截面的分段数
 
 std::vector<float> ringVertices;
 
 void generateRingVertices() {
-	const float thickness = 0.1f; // 定义 ring 的厚度
-
-	for (int i = 0; i <= segments_ring; ++i) {
+	for (int i = 0; i < segments_ring; ++i) {
 		float theta = 2.0f * M_PI * i / segments_ring;
-		float xInner = innerRadius * cos(theta);
-		float zInner = innerRadius * sin(theta);
-		float xOuter = outerRadius * cos(theta);
-		float zOuter = outerRadius * sin(theta);
+		float cosTheta = cos(theta);
+		float sinTheta = sin(theta);
 
-		for (int j = 0; j <= verticalSegments; ++j) {
-			float y = -thickness / 2 + (thickness * j / verticalSegments);
-			float color = static_cast<float>(j) / verticalSegments;
+		for (int j = 0; j < segments_circle; ++j) {
+			float phi = 2.0f * M_PI * j / segments_circle;
+			float cosPhi = cos(phi);
+			float sinPhi = sin(phi);
 
-			// 内边缘顶点
-			ringVertices.push_back(xInner); // x
-			ringVertices.push_back(y);      // y
-			ringVertices.push_back(zInner); // z
-			ringVertices.push_back(0.0f);   // r
-			ringVertices.push_back(1.0f - color); // g
-			ringVertices.push_back(0.0f);   // b
+			float x = (outerRadius - innerRadius) / 2.0f * cosPhi;
+			float y = (outerRadius - innerRadius) / 2.0f * sinPhi;
+			float z = 0.0f;
 
-			// 外边缘顶点
-			ringVertices.push_back(xOuter); // x
-			ringVertices.push_back(y);      // y
-			ringVertices.push_back(zOuter); // z
-			ringVertices.push_back(0.0f);   // r
-			ringVertices.push_back(0.0f);   // g
-			ringVertices.push_back(1.0f - color); // b
+			// 旋转截面圆
+			float rotatedX = (innerRadius + outerRadius) / 2.0f * cosTheta + x * cosTheta - z * sinTheta;
+			float rotatedY = (innerRadius + outerRadius) / 2.0f * sinTheta + x * sinTheta + z * cosTheta;
+
+			ringVertices.push_back(rotatedX); // x
+			ringVertices.push_back(y);        // y
+			ringVertices.push_back(rotatedY); // z
+			ringVertices.push_back(0.0f);     // r
+			ringVertices.push_back(1.0f);     // g
+			ringVertices.push_back(0.0f);     // b
 		}
 	}
 }
 
 
 
+// 球体参数
+const float sphereRadius = innerRadius - radius; // 球体半径
+const int segments_sphere = 36; // 球体分段数
 
+std::vector<float> sphereVertices;
 
+// 生成球体顶点
+void generateSphereVertices() {
+	for (int i = 0; i <= segments_sphere; ++i) {
+		float theta = i * M_PI / segments_sphere;
+		for (int j = 0; j <= segments_sphere; ++j) {
+			float phi = j * 2 * M_PI / segments_sphere;
+			float x = sphereRadius * sin(theta) * cos(phi);
+			float y = sphereRadius * cos(theta);
+			float z = sphereRadius * sin(theta) * sin(phi);
+			sphereVertices.push_back(x);
+			sphereVertices.push_back(y);
+			sphereVertices.push_back(z);
+			sphereVertices.push_back(1.0f); // r
+			sphereVertices.push_back(1.0f); // g
+			sphereVertices.push_back(0.0f); // b
+		}
+	}
+}
 
 
 glm::vec3 cube_pos = glm::vec3(0.0f, 0.0f, 0.0f);
-//
-//float vertices[] =
-//{
-//	//pos					//col			
-//	-0.5f, -0.5f, -0.5f,  	1.f, 0.0f, 0.0f,
-//	0.5f, -0.5f, -0.5f,  	1.f, 0.0f, 0.0f,
-//	0.5f,  0.5f, -0.5f,  	1.f, 0.0f, 0.0f,
-//	0.5f,  0.5f, -0.5f,  	1.f, 0.0f, 0.0f,
-//	-0.5f,  0.5f, -0.5f,  	1.f, 0.0f, 0.0f,
-//	-0.5f, -0.5f, -0.5f,  	1.f, 0.0f, 0.0f,
-//
-//	-0.5f, -0.5f,  0.5f,  	0.0f, 1.0f, 0.0f,
-//	0.5f, -0.5f,  0.5f,  	0.0f, 1.0f, 0.0f,
-//	0.5f,  0.5f,  0.5f,  	0.0f, 1.0f, 0.0f,
-//	0.5f,  0.5f,  0.5f,  	0.0f, 1.0f, 0.0f,
-//	-0.5f,  0.5f,  0.5f,  	0.0f, 1.0f, 0.0f,
-//	-0.5f, -0.5f,  0.5f,  	0.0f, 1.0f, 0.0f,
-//
-//	-0.5f,  0.5f,  0.5f,  	0.0f, 0.0f, 1.0f,
-//	-0.5f,  0.5f, -0.5f,  	0.0f, 0.0f, 1.0f,
-//	-0.5f, -0.5f, -0.5f,  	0.0f, 0.0f, 1.0f,
-//	-0.5f, -0.5f, -0.5f,  	0.0f, 0.0f, 1.0f,
-//	-0.5f, -0.5f,  0.5f,  	0.0f, 0.0f, 1.0f,
-//	-0.5f,  0.5f,  0.5f,  	0.0f, 0.0f, 1.0f,
-//
-//	0.5f,  0.5f,  0.5f,  	1.f, 1.0f, 0.0f,
-//	0.5f,  0.5f, -0.5f,  	1.f, 1.0f, 0.0f,
-//	0.5f, -0.5f, -0.5f, 	1.f, 1.0f, 0.0f,
-//	0.5f, -0.5f, -0.5f,  	1.f, 1.0f, 0.0f,
-//	0.5f, -0.5f,  0.5f,  	1.f, 1.0f, 0.0f,
-//	0.5f,  0.5f,  0.5f,  	1.f, 1.0f, 0.0f,
-//
-//	-0.5f, -0.5f, -0.5f,  	1.f, 0.0f, 1.0f,
-//	0.5f, -0.5f, -0.5f,  	1.f, 0.0f, 1.0f,
-//	0.5f, -0.5f,  0.5f,  	1.f, 0.0f, 1.0f,
-//	0.5f, -0.5f,  0.5f,  	1.f, 0.0f, 1.0f,
-//	-0.5f, -0.5f,  0.5f,  	1.f, 0.0f, 1.0f,
-//	-0.5f, -0.5f, -0.5f,  	1.f, 0.0f, 1.0f,
-//
-//	-0.5f,  0.5f, -0.5f,  	0.0f, 1.f, 1.0f,
-//	0.5f,  0.5f, -0.5f,  	0.0f, 1.f, 1.0f,
-//	0.5f,  0.5f,  0.5f,  	0.0f, 1.f, 1.0f,
-//	0.5f,  0.5f,  0.5f,  	0.0f, 1.f, 1.0f,
-//	-0.5f,  0.5f,  0.5f,  	0.0f, 1.f, 1.0f,
-//	-0.5f,  0.5f, -0.5f, 	0.0f, 1.f, 1.0f,
-//};
 
 SCamera Camera;
-
-
-
-
-
 
 
 void processKeyboard(GLFWwindow* window)
@@ -188,12 +152,12 @@ void processKeyboard(GLFWwindow* window)
 
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
-		cam_dist += 0.001f;
+		cam_dist += 0.005f;
 		cam_changed = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
-		cam_dist -= 0.001f;
+		cam_dist -= 0.005f;
 		cam_changed = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -235,14 +199,17 @@ int main(int argc, char** argv)
 // generate cone vertex
 	generateConeVertices();
 	generateRingVertices();
+	generateSphereVertices();
 
 
-	unsigned int VAO[2];
+	unsigned int VAO[3];
 	glGenVertexArrays(1, &VAO[0]);
 	glGenVertexArrays(1, &VAO[1]);
-	unsigned int VBO[2];
+	glGenVertexArrays(1, &VAO[2]);
+	unsigned int VBO[3];
 	glGenBuffers(1, &VBO[0]);
 	glGenBuffers(1, &VBO[1]);
+	glGenBuffers(1, &VBO[2]);
 
 
 	glBindVertexArray(VAO[0]);
@@ -266,20 +233,10 @@ int main(int argc, char** argv)
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
-	/*glBindVertexArray(VAO[1]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ringVertices.size(), &ringVertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);*/
 	glBindVertexArray(VAO[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ringVertices.size(), &ringVertices[0], GL_STATIC_DRAW);
@@ -287,7 +244,17 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
+	// 绑定球体顶点
+	glBindVertexArray(VAO[2]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphereVertices.size(), &sphereVertices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -324,9 +291,28 @@ int main(int argc, char** argv)
 		modelRing = glm::translate(modelRing, glm::vec3(0.0f, .5f, 0.0f)); // Translate the ring above the cone
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
 
-        glBindVertexArray(VAO[1]);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, (segments_ring + 1) * (verticalSegments + 1) * 2);
-        glBindVertexArray(0);
+		glBindVertexArray(VAO[1]);
+		for (int i = 0; i < segments_ring; ++i) {
+			glDrawArrays(GL_TRIANGLE_STRIP, i * (segments_circle + 1), (segments_circle + 1) * 2);
+		}
+		glBindVertexArray(0);
+
+
+		glm::mat4 modelSphere = glm::mat4(1.f);
+
+		// 计算球体的中心位置，使其与圆锥的侧面相切
+		float coneSideY = height - sphereRadius / tan(M_PI / segments_cone);
+		float coneSideX = radius - sphereRadius;
+
+		// 计算球体的中心位置，使其与环的内侧相切
+		float ringInnerX = innerRadius - sphereRadius;
+
+		modelSphere = glm::translate(modelSphere, glm::vec3(ringInnerX, coneSideY, 0.0f));
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
+		glBindVertexArray(VAO[2]);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, (segments_sphere + 1) * (segments_sphere + 1));
+		glBindVertexArray(0);
+
 
 		glm::mat4 view = glm::mat4(1.f);
 		//view = glm::translate(view, -glm::vec3(0.f, 0.f, 3.f));
@@ -334,7 +320,7 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		glm::mat4 projection = glm::mat4(1.f);
-		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, 1.f, 100.f);
+		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, .5f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		
 		glfwSwapBuffers(window);
