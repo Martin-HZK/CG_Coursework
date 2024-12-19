@@ -132,122 +132,71 @@ void generateRingVertices() {
 
 
 
-const float sphereRadius = 0.25f; // 球体半径
-const int segments_lat = 36;    // 纬线分段数
-const int segments_lon = 36;    // 经线分段数
+// 球体参数
+const float sphereRadius = 0.1f; // 半径
+const int segmentsLatitude = 36; // 纬度分段数
+const int segmentsLongitude = 36; // 经度分段数
 
-std::vector<float> sphereVertices;
+std::vector<float> sphereVertices; // 顶点数据
+std::vector<unsigned int> sphereIndices; // 索引数据
 
-// 生成球体顶点
+// 生成球体顶点数据
 void generateSphereVertices() {
+	for (int lat = 0; lat <= segmentsLatitude; ++lat) {
+		float theta = M_PI * lat / segmentsLatitude; // 纬度角，从 0 到 π
+		float sinTheta = sin(theta);
+		float cosTheta = cos(theta);
 
-	float x, y, z;
-	float xy; // 半径为 1 的 xy 平面上的长度
-	float nx, ny, nz, lenghthInv = 1.f / radius; // 法线
-	//float s, t; // 纹理坐标
+		for (int lon = 0; lon <= segmentsLongitude; ++lon) {
+			float phi = 2.0f * M_PI * lon / segmentsLongitude; // 经度角，从 0 到 2π
+			float sinPhi = sin(phi);
+			float cosPhi = cos(phi);
 
-	float sectorStep = 2 * M_PI / segments_lon;
-	float stackStep = M_PI / segments_lat;
-	float sectorAngle, stackAngle;
+			// 顶点坐标
+			float x = sphereRadius * sinTheta * cosPhi;
+			float y = sphereRadius * cosTheta;
+			float z = sphereRadius * sinTheta * sinPhi;
 
-	for (int i = 0; i <= segments_lat; ++i) {
-		stackAngle = M_PI / 2 - i * stackStep;
-		xy = sphereRadius * cos(stackAngle);
-		z = sphereRadius * sin(stackAngle);
+			// 法线
+			float nx = sinTheta * cosPhi;
+			float ny = cosTheta;
+			float nz = sinTheta * sinPhi;
 
-		for (int j = 0; j <= segments_lon; ++j) {
-			sectorAngle = j * sectorStep;
+			// 顶点颜色
+			float r = 0.5f + 0.5f * nx;
+			float g = 0.5f + 0.5f * ny;
+			float b = 0.5f + 0.5f * nz;
 
-			x = xy * cos(sectorAngle);
-			y = xy * sin(sectorAngle);
-			nx = x * lenghthInv;
-			ny = y * lenghthInv;
-			nz = z * lenghthInv;
-
-			sphereVertices.push_back(x);
+			// 添加顶点
+			sphereVertices.push_back(x);  // 位置
 			sphereVertices.push_back(y);
 			sphereVertices.push_back(z);
-			sphereVertices.push_back(fabs(x));  // 颜色
-			sphereVertices.push_back(fabs(y));
-			sphereVertices.push_back(fabs(z));
-			sphereVertices.push_back(nx);      // 法线
+			sphereVertices.push_back(r);  // 颜色
+			sphereVertices.push_back(g);
+			sphereVertices.push_back(b);
+			sphereVertices.push_back(nx); // 法线
 			sphereVertices.push_back(ny);
 			sphereVertices.push_back(nz);
 		}
+	}
 
-		// 重复起点和终点，避免缝隙
-		if (i > 0 && i < segments_lat) {
-			// 重复最后一个顶点
-			sphereVertices.insert(sphereVertices.end(), sphereVertices.end() - 9, sphereVertices.end());
+	// 生成索引数据
+	for (int lat = 0; lat < segmentsLatitude; ++lat) {
+		for (int lon = 0; lon < segmentsLongitude; ++lon) {
+			unsigned int first = lat * (segmentsLongitude + 1) + lon;
+			unsigned int second = first + segmentsLongitude + 1;
+
+			// 三角形 1
+			sphereIndices.push_back(first);
+			sphereIndices.push_back(second);
+			sphereIndices.push_back(first + 1);
+
+			// 三角形 2
+			sphereIndices.push_back(second);
+			sphereIndices.push_back(second + 1);
+			sphereIndices.push_back(first + 1);
 		}
 	}
-	//for (int i = 0; i <= segments_lat; ++i) {
-
-	//	stackAngle = M_PI / 2 - i * stackStep; // 从北极到南极
-	//	xy = sphereRadius * cos(stackAngle); // 在 xy 平面上的半径
-	//	z = sphereRadius * sin(stackAngle); // z 坐标
-
-	//	for (int j = 0; j <= segments_lon; ++j) {
-	//		sectorAngle = j * sectorStep; // 经线角度
-
-	//		// 计算顶点坐标
-	//		x = xy * cos(sectorAngle);
-	//		y = xy * sin(sectorAngle);
-
-	//		nx = x * lenghthInv;
-	//		ny = y * lenghthInv;
-	//		nz = z * lenghthInv;
-
-	//		//// 计算纹理坐标
-	//		//s = (float)j / segments_lon;
-	//		//t = (float)i / segments_lat;
-
-	//		// 顶点位置
-	//		sphereVertices.push_back(x);
-	//		sphereVertices.push_back(y);
-	//		sphereVertices.push_back(z);
-
-	//		// 颜色（简单使用位置映射）
-	//		sphereVertices.push_back(fabs(x));
-	//		sphereVertices.push_back(fabs(y));
-	//		sphereVertices.push_back(fabs(z));
-
-	//		sphereVertices.push_back(nx);
-	//		sphereVertices.push_back(ny);
-	//		sphereVertices.push_back(nz);
-	//	}
-	//}
-
-	//for (int i = 0; i <= segments_lat; ++i) {
-	//	float theta = M_PI * i / segments_lat;
-	//	float sinTheta = sin(theta);
-	//	float cosTheta = cos(theta);
-
-	//	for (int j = 0; j <= segments_lon; ++j) {
-	//		float phi = 2.0f * M_PI * j / segments_lon;
-	//		float sinPhi = sin(phi);
-	//		float cosPhi = cos(phi);
-
-	//		float x = sphereRadius * sinTheta * cosPhi;
-	//		float y = sphereRadius * cosTheta;
-	//		float z = sphereRadius * sinTheta * sinPhi;
-
-	//		// 顶点位置
-	//		sphereVertices.push_back(x);
-	//		sphereVertices.push_back(y);
-	//		sphereVertices.push_back(z);
-
-	//		// 颜色（简单使用位置映射）
-	//		sphereVertices.push_back(fabs(x));
-	//		sphereVertices.push_back(fabs(y));
-	//		sphereVertices.push_back(fabs(z));
-
-	//		// 法线
-	//		sphereVertices.push_back(x / sphereRadius);
-	//		sphereVertices.push_back(y / sphereRadius);
-	//		sphereVertices.push_back(z / sphereRadius);
-	//	}
-	//}
 }
 
 
@@ -334,6 +283,8 @@ int main(int argc, char** argv)
 	glGenVertexArrays(1, &VAO[0]);
 	glGenVertexArrays(1, &VAO[1]);
 	glGenVertexArrays(1, &VAO[2]);
+	unsigned int EBO;
+	glGenBuffers(1, &EBO);
 	unsigned int VBO[3];
 	glGenBuffers(1, &VBO[0]);
 	glGenBuffers(1, &VBO[1]);
@@ -369,12 +320,17 @@ int main(int argc, char** argv)
 	glBindVertexArray(VAO[2]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphereVertices.size(), &sphereVertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), &sphereIndices[0], GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -429,7 +385,8 @@ int main(int argc, char** argv)
 
 		// 绑定 VAO 并绘制球体
 		glBindVertexArray(VAO[2]);
-		glDrawArrays(GL_TRIANGLES, 0, sphereVertices.size() / 9);
+		//glDrawArrays(GL_TRIANGLES, 0, sphereVertices.size() / 9);
+		glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 
