@@ -31,7 +31,7 @@ float CalculateDirectionIllumination()
 
 void main()
 {
-	// fragCol = vec4(col, 1.f);
-	float phong = CalculateDirectionIllumination();
-	fragColour = vec4(phong * col * lightColour, 1.f);
+	 fragColour = vec4(col, 1.f);
+	//float phong = CalculateDirectionIllumination();
+	//fragColour = vec4(phong * col * lightColour, 1.f);
 }
