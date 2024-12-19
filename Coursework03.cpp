@@ -16,7 +16,7 @@
 // 圆锥参数
 const float radius = 0.5f; // 底面半径
 const float height = 1.0f; // 高度
-const int segments_cone = 36;   // 圆的分段数
+const int segments_cone = 128;   // 圆的分段数
 
 std::vector<float> coneVertices;
 
@@ -82,50 +82,70 @@ void generateConeVertices() {
 	}
 }
 
-const float innerRadius = 0.3f;
-const float outerRadius = 0.5f;
-const int segments_ring = 10000;
-const int segments_circle = 36; // 圆形截面的分段数
+// 圆环参数
+const float majorRadius = 0.4f;  // 主半径（中心到圆心的距离）
+const float minorRadius = 0.1f;  // 次半径（圆环粗细）
+const int segmentsMajor = 64;    // 主环分段数
+const int segmentsMinor = 32;    // 次环分段数
 
-std::vector<float> ringVertices;
+std::vector<float> torusVertices;
+std::vector<unsigned int> torusIndices;
 
-void generateRingVertices() {
-	for (int i = 0; i < segments_ring; ++i) {
-		float theta = 2.0f * M_PI * i / segments_ring;
+// 生成圆环顶点和索引
+void generateTorusVertices() {
+	for (int i = 0; i <= segmentsMajor; ++i) {
+		float theta = 2.0f * M_PI * i / segmentsMajor; // 主环角度
 		float cosTheta = cos(theta);
 		float sinTheta = sin(theta);
 
-		for (int j = 0; j < segments_circle; ++j) {
-			float phi = 2.0f * M_PI * j / segments_circle;
+		for (int j = 0; j <= segmentsMinor; ++j) {
+			float phi = 2.0f * M_PI * j / segmentsMinor; // 次环角度
 			float cosPhi = cos(phi);
 			float sinPhi = sin(phi);
 
-			float x = (outerRadius - innerRadius) / 2.0f * cosPhi;
-			float y = (outerRadius - innerRadius) / 2.0f * sinPhi;
-			float z = 0.0f;
+			// 顶点位置
+			float x = (majorRadius + minorRadius * cosPhi) * cosTheta;
+			float y = (majorRadius + minorRadius * cosPhi) * sinTheta;
+			float z = minorRadius * sinPhi;
 
-			// 旋转截面圆
-			float rotatedX = (innerRadius + outerRadius) / 2.0f * cosTheta + x * cosTheta - z * sinTheta;
-			float rotatedY = (innerRadius + outerRadius) / 2.0f * sinTheta + x * sinTheta + z * cosTheta;
-
-			// 计算法线
+			// 法线
 			float nx = cosPhi * cosTheta;
-			float ny = sinPhi;
-			float nz = cosPhi * sinTheta;
+			float ny = cosPhi * sinTheta;
+			float nz = sinPhi;
 
-			ringVertices.push_back(rotatedX); // x
-			ringVertices.push_back(y);        // y
-			ringVertices.push_back(rotatedY); // z
-			ringVertices.push_back(0.0f);     // r
-			ringVertices.push_back(1.0f);     // g
-			ringVertices.push_back(0.0f);     // b
-			ringVertices.push_back(nx);       // nx
-			ringVertices.push_back(ny);       // ny
-			ringVertices.push_back(nz);       // nz
+			// 顶点颜色
+			float r = 0.5f + 0.5f * nx;
+			float g = 0.5f + 0.5f * ny;
+			float b = 0.5f + 0.5f * nz;
+
+			// 添加顶点数据
+			torusVertices.push_back(x);  // 位置
+			torusVertices.push_back(y);
+			torusVertices.push_back(z);
+			torusVertices.push_back(r);  // 颜色
+			torusVertices.push_back(g);
+			torusVertices.push_back(b);
+			torusVertices.push_back(nx); // 法线
+			torusVertices.push_back(ny);
+			torusVertices.push_back(nz);
 		}
-		if (i > 0 && i <segments_ring) {
-			// 重复最后一个顶点
-			ringVertices.insert(ringVertices.end(), ringVertices.end() - 9, ringVertices.end());
+	}
+
+	// 生成索引数据
+	for (int i = 0; i < segmentsMajor; ++i) {
+		for (int j = 0; j < segmentsMinor; ++j) {
+			unsigned int first = i * (segmentsMinor + 1) + j;
+			unsigned int second = first + segmentsMinor + 1;
+
+			// 三角形 1
+			torusIndices.push_back(first);
+			torusIndices.push_back(second);
+			torusIndices.push_back(first + 1);
+
+			// 三角形 2
+			torusIndices.push_back(second);
+			torusIndices.push_back(second + 1);
+			torusIndices.push_back(first + 1);
 		}
 	}
 }
@@ -199,6 +219,72 @@ void generateSphereVertices() {
 	}
 }
 
+// 球体参数
+const float sphereRadius_1 = 0.1f; // 半径
+const int segmentsLatitude_1 = 36; // 纬度分段数
+const int segmentsLongitude_1 = 36; // 经度分段数
+
+std::vector<float> sphereVertices_1; // 顶点数据
+std::vector<unsigned int> sphereIndices_1; // 索引数据
+
+// 生成球体顶点数据
+void generateSphereVertices_1() {
+	for (int lat = 0; lat <= segmentsLatitude_1; ++lat) {
+		float theta = M_PI * lat / segmentsLatitude_1; // 纬度角，从 0 到 π
+		float sinTheta = sin(theta);
+		float cosTheta = cos(theta);
+
+		for (int lon = 0; lon <= segmentsLongitude_1; ++lon) {
+			float phi = 2.0f * M_PI * lon / segmentsLongitude_1; // 经度角，从 0 到 2π
+			float sinPhi = sin(phi);
+			float cosPhi = cos(phi);
+
+			// 顶点坐标
+			float x = sphereRadius_1 * sinTheta * cosPhi;
+			float y = sphereRadius_1 * cosTheta;
+			float z = sphereRadius_1 * sinTheta * sinPhi;
+
+			// 法线
+			float nx = sinTheta * cosPhi;
+			float ny = cosTheta;
+			float nz = sinTheta * sinPhi;
+
+			// 顶点颜色
+			float r = 0.5f + 0.5f * nx;
+			float g = 0.5f + 0.5f * ny;
+			float b = 0.5f + 0.5f * nz;
+
+			// 添加顶点
+			sphereVertices_1.push_back(x);  // 位置
+			sphereVertices_1.push_back(y);
+			sphereVertices_1.push_back(z);
+			sphereVertices_1.push_back(r);  // 颜色
+			sphereVertices_1.push_back(g);
+			sphereVertices_1.push_back(b);
+			sphereVertices_1.push_back(nx); // 法线
+			sphereVertices_1.push_back(ny);
+			sphereVertices_1.push_back(nz);
+		}
+	}
+
+	// 生成索引数据
+	for (int lat = 0; lat < segmentsLatitude_1; ++lat) {
+		for (int lon = 0; lon < segmentsLongitude_1; ++lon) {
+			unsigned int first = lat * (segmentsLongitude_1 + 1) + lon;
+			unsigned int second = first + segmentsLongitude_1 + 1;
+
+			// 三角形 1
+			sphereIndices_1.push_back(first);
+			sphereIndices_1.push_back(second);
+			sphereIndices_1.push_back(first + 1);
+
+			// 三角形 2
+			sphereIndices_1.push_back(second);
+			sphereIndices_1.push_back(second + 1);
+			sphereIndices_1.push_back(first + 1);
+		}
+	}
+}
 
 
 glm::vec3 cube_pos = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -267,28 +353,40 @@ int main(int argc, char** argv)
 	GLFWwindow* window = CreateWindow(800, 600, "Model Viewer Camera");
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	int numMultiSamples;
+	glGetIntegerv(GL_MAX_SAMPLES, &numMultiSamples);
+	std::cout << "Max number of samples is " << numMultiSamples << std::endl;
 
 	unsigned int shaderProgram = LoadShader("mvp.vert", "col.frag");
 
 	InitCamera(Camera);
+	//Camera.Pitch = -8.5f;
+	//Camera.Yaw = -12.f;
 	MoveAndOrientCamera(Camera, cube_pos, cam_dist, 0.f, 0.f);
 
 // generate cone vertex
 	generateConeVertices();
-	generateRingVertices();
+	generateTorusVertices();
 	generateSphereVertices();
+	generateSphereVertices_1();
 
 
-	unsigned int VAO[3];
+	unsigned int VAO[4];
 	glGenVertexArrays(1, &VAO[0]);
 	glGenVertexArrays(1, &VAO[1]);
 	glGenVertexArrays(1, &VAO[2]);
-	unsigned int EBO;
-	glGenBuffers(1, &EBO);
-	unsigned int VBO[3];
+	glGenVertexArrays(1, &VAO[3]);
+
+	unsigned int EBO[3];
+	glGenBuffers(1, &EBO[0]);
+	glGenBuffers(1, &EBO[1]);
+	glGenBuffers(1, &EBO[2]);
+
+	unsigned int VBO[4];
 	glGenBuffers(1, &VBO[0]);
 	glGenBuffers(1, &VBO[1]);
 	glGenBuffers(1, &VBO[2]);
+	glGenBuffers(1, &VBO[3]);
 
 
 	glBindVertexArray(VAO[0]);
@@ -306,7 +404,11 @@ int main(int argc, char** argv)
 
 	glBindVertexArray(VAO[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * ringVertices.size(), &ringVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, torusVertices.size() * sizeof(float), &torusVertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices.size() * sizeof(unsigned int), &torusIndices[0], GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -321,7 +423,7 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[2]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphereVertices.size(), &sphereVertices[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), &sphereIndices[0], GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
@@ -330,7 +432,23 @@ int main(int argc, char** argv)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
+	// 绑定球体顶点
+	glBindVertexArray(VAO[3]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO[3]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphereVertices.size(), &sphereVertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[2]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), &sphereIndices[0], GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -368,27 +486,35 @@ int main(int argc, char** argv)
 		// print the vertices of modelRing
 		glm::mat4 modelRing = glm::mat4(1.f);
 		modelRing = glm::translate(modelRing, glm::vec3(0.0f, .5f, 0.0f)); // Translate the ring above the cone
+		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
 
 		glBindVertexArray(VAO[1]);
-		for (int i = 0; i < segments_ring; ++i) {
-			glDrawArrays(GL_TRIANGLES, i * (segments_circle + 1), (segments_circle + 1) * 2);
-		}
+		glDrawElements(GL_TRIANGLES, torusIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 
 
 		// 设置模型矩阵
 		glm::mat4 modelSphere = glm::mat4(1.f);
-		modelSphere = glm::translate(modelSphere, glm::vec3(0.0f, 1.5f, 0.0f));
+		modelSphere = glm::translate(modelSphere, glm::vec3(0.28f, .65f, 0.0f));
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
 
 		// 绑定 VAO 并绘制球体
 		glBindVertexArray(VAO[2]);
-		//glDrawArrays(GL_TRIANGLES, 0, sphereVertices.size() / 9);
 		glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
+		// 设置模型矩阵
+		glm::mat4 modelSphere_1 = glm::mat4(1.f);
+		modelSphere_1 = glm::translate(modelSphere_1, glm::vec3(1.0f, 1.5f, 0.0f));
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere_1));
+
+		// 绑定 VAO 并绘制球体
+		glBindVertexArray(VAO[3]);
+		glDrawElements(GL_TRIANGLES, sphereIndices_1.size(), GL_UNSIGNED_INT, 0);
+		glBindVertexArray(0);
 
 		glm::mat4 view = glm::mat4(1.f);
 		//view = glm::translate(view, -glm::vec3(0.f, 0.f, 3.f));

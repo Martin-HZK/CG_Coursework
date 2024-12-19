@@ -19,6 +19,7 @@ GLFWwindow* CreateWindow(int w, int h, const char* title)
 	//Use core profile (i.e., a subset of OpenGL features without backwards-compatible features we no longer need
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	glfwWindowHint(GLFW_SAMPLES, 8);
 	//Create a window with specified width, height, and title
 	GLFWwindow* window = glfwCreateWindow(w, h, title, NULL, NULL);
 
