@@ -39,14 +39,21 @@ void main()
 	 //fragColour = vec4(col, 1.f);
 	float phong = CalculateDirectionIllumination();
 	//fragColour = vec4(phong * col * lightColour, 1.f);
-	vec4 textureColor;
+	//vec4 textureColour;
 	//if (useTexture1 == 1) {
 		//fragColour = texture(Texture1, tex);
 	//} else {
 		//fragColour = texture(Texture2, tex);
 	//}
-	fragColour = texture(Texture, tex);
+	//fragColour = texture(Texture, tex);
 	
-    //fragColour = vec4(phong * textureColour.rgb * lightColour, textureColour.a);
+     // Sample texture color
+    vec4 textureColour = texture(Texture, tex);
+
+    // Combine texture color with lighting
+    vec3 finalColour = phong * textureColour.rgb * lightColour;
+
+    // Output final color
+    fragColour = vec4(finalColour, textureColour.a);
 
 }
