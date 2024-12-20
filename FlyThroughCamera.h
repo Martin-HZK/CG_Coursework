@@ -4,28 +4,27 @@
 #include <glm/glm/gtc/matrix_transform.hpp>
 #include "camera.h"
 
-void MoveCamera(SCamera& in, SCamera::Camera_Movement direction)
+void MoveCamera(SCamera& in, SCamera::Camera_Movement direction, float deltaTime)
 {
+    float velocity = in.MovementSpeed * deltaTime * 5;
     // 按照不同的方向移动相机
     if (direction == SCamera::FORWARD)
-        in.Position += in.Front * in.MovementSpeed;
+        in.Position += in.Front * velocity;
     if (direction == SCamera::BACKWARD)
-        in.Position -= in.Front * in.MovementSpeed;
+		in.Position -= in.Front * velocity;
     if (direction == SCamera::LEFT)
-        in.Position -= in.Right * in.MovementSpeed;
+		in.Position -= in.Right * velocity;
     if (direction == SCamera::RIGHT)
-        in.Position += in.Right * in.MovementSpeed;
-    /*if (direction == SCamera::UP)
-        in.Position += in.Up * in.MovementSpeed;
-    if (direction == SCamera::DOWN)
-        in.Position -= in.Up * in.MovementSpeed;*/
+        in.Position += in.Right * velocity;
 }
 
-void OrientCamera(SCamera& in, float xoffset, float yoffset)
+void OrientCamera(SCamera& in, float xoffset, float yoffset, float deltaTime)
 {
+	//float sensitivity = 0.1f;
+    
     // 调整偏航角和俯仰角
-    in.Yaw += xoffset * in.MouseSensitivity;
-    in.Pitch += yoffset * in.MouseSensitivity;
+    in.Yaw += xoffset * in.MouseSensitivity * deltaTime;
+    in.Pitch += yoffset * in.MouseSensitivity * deltaTime;
 
     // 限制俯仰角，避免超出 89 度
     if (in.Pitch > 89.0f)

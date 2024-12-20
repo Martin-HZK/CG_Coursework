@@ -324,7 +324,7 @@ glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
 glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
 
 SCamera Camera;
-
+float deltaTime = 0.016f; // 每帧间隔时间
 
 void processKeyboard(GLFWwindow* window)
 {
@@ -336,7 +336,7 @@ void processKeyboard(GLFWwindow* window)
 		lightDirection = Camera.Front;
 		lightPos = Camera.Position;
 	}
-	std::cout << "The camera is: " << (int) isModelViewer << std::endl;
+	//std::cout << "The camera is: " << (int) isModelViewer << std::endl;
 	bool cam_changed = false;
 	float x = 0.f, y = 0.f;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && isModelViewer)
@@ -374,25 +374,22 @@ void processKeyboard(GLFWwindow* window)
 		y = -.5f;
 		cam_changed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && !isModelViewer)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !isModelViewer)
 	{
-		x = 0.05f;
-		cam_changed = true;
+		MoveCamera(Camera, SCamera::FORWARD, deltaTime);
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && !isModelViewer)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !isModelViewer)
 	{
-		x = -0.05f;
-		cam_changed = true;
+		MoveCamera(Camera, SCamera::BACKWARD, deltaTime);
+
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && !isModelViewer)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !isModelViewer)
 	{
-		y = 0.05f;
-		cam_changed = true;
+		MoveCamera(Camera, SCamera::LEFT, deltaTime);
 	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && !isModelViewer)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !isModelViewer)
 	{
-		y = -0.05f;
-		cam_changed = true;
+		MoveCamera(Camera, SCamera::RIGHT, deltaTime);
 	}
 
 
@@ -410,15 +407,9 @@ void processKeyboard(GLFWwindow* window)
 		Camera.Up = glm::normalize(glm::cross(Camera.Right, Camera.Front));
 		//InitCamera(Camera);
 	}
-	if (cam_changed)
+	if (cam_changed && isModelViewer)
 	{
-		if (isModelViewer)
-			MoveAndOrientCamera(Camera, cube_pos, cam_dist, x, y);
-		else
-		{
-			MoveCamera(Camera, SCamera::FORWARD);  // 应用相机移动
-			//OrientCamera(Camera, x, y);
-		}
+		MoveAndOrientCamera(Camera, cube_pos, cam_dist, x, y);
 	}
 	
 }
@@ -441,7 +432,7 @@ void processMouse(GLFWwindow* window, double x, double y)
 	prevMouseX = x;
 	prevMouseY = y;
 
-	OrientCamera(Camera, dX, dY);
+	OrientCamera(Camera, dX, dY, deltaTime);
 }
 
 int main(int argc, char** argv)
@@ -449,10 +440,7 @@ int main(int argc, char** argv)
 	GLFWwindow* window = CreateWindow_1(800, 600, "Model Viewer Camera");
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	/*if (!isModelViewer)
-	{
-		glfwSetCursorPosCallback(window, processMouse);
-	}*/
+	
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	int numMultiSamples;
@@ -575,7 +563,10 @@ int main(int argc, char** argv)
 	{
 
 		processKeyboard(window);
-
+		if (!isModelViewer)
+		{
+			glfwSetCursorPosCallback(window, processMouse);
+		}
 		glClearColor(.0f, .0f, .0f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
