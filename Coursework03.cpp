@@ -7,12 +7,17 @@
 #include <iostream>
 
 #include "ModelViewerCamera.h"
+#include "FlyThroughCamera.h"
 #include "camera.h"
 #include "shader.h"
 #include "window.h"
 #include "texture.h"
 #include <corecrt_math_defines.h>
 #include <vector>
+
+
+boolean isModelViewer = true;
+
 
 // 圆锥参数
 const float radius = 0.5f; // 底面半径
@@ -331,54 +336,123 @@ void processKeyboard(GLFWwindow* window)
 		lightDirection = Camera.Front;
 		lightPos = Camera.Position;
 	}
-
+	std::cout << "The camera is: " << (int) isModelViewer << std::endl;
 	bool cam_changed = false;
 	float x = 0.f, y = 0.f;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && isModelViewer)
 	{
 		x = .5f;
 		y = 0.f;
 		cam_changed = true;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && isModelViewer)
 	{
 		cam_dist += 0.005f;
 		cam_changed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && isModelViewer)
 	{
 		cam_dist -= 0.005f;
 		cam_changed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && isModelViewer)
 	{
 		x = -.5f;
 		y = 0.f;
 		cam_changed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && isModelViewer)
 	{
 		x = 0.f;
 		y = .5f;
 		cam_changed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && isModelViewer)
 	{
 		x = 0.f;
 		y = -.5f;
 		cam_changed = true;
 	}
-	if (cam_changed)
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && !isModelViewer)
 	{
-		MoveAndOrientCamera(Camera, cube_pos, cam_dist, x, y);
+		x = 0.05f;
+		cam_changed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && !isModelViewer)
+	{
+		x = -0.05f;
+		cam_changed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && !isModelViewer)
+	{
+		y = 0.05f;
+		cam_changed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && !isModelViewer)
+	{
+		y = -0.05f;
+		cam_changed = true;
 	}
 
+
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+		isModelViewer = !isModelViewer;  // 切换相机模式
+
+		//// 当切换相机模式时，将相机回到中心
+		Camera.Position = glm::vec3(0.0f, 0.0f,3.0f);  // 你可以设置为你想要的初始位置
+		Camera.Yaw = -90.0f;  // 设置初始的Yaw角
+		Camera.Pitch = 0.0f;  // 设置初始的Pitch角
+		Camera.Front = glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f));  // 设置相机的前方方向
+
+		// 重新计算Right和Up向量
+		Camera.Right = glm::normalize(glm::cross(Camera.Front, Camera.WorldUp));
+		Camera.Up = glm::normalize(glm::cross(Camera.Right, Camera.Front));
+		//InitCamera(Camera);
+	}
+	if (cam_changed)
+	{
+		if (isModelViewer)
+			MoveAndOrientCamera(Camera, cube_pos, cam_dist, x, y);
+		else
+		{
+			MoveCamera(Camera, SCamera::FORWARD);  // 应用相机移动
+			//OrientCamera(Camera, x, y);
+		}
+	}
+	
+}
+bool firstMouse = true;
+float prevMouseX;
+float prevMouseY;
+
+void processMouse(GLFWwindow* window, double x, double y)
+{
+	if (firstMouse)
+	{
+		prevMouseX = x;
+		prevMouseY = y;
+		firstMouse = false;
+	}
+
+	float dX = x - prevMouseX;
+	float dY = y - prevMouseY;
+
+	prevMouseX = x;
+	prevMouseY = y;
+
+	OrientCamera(Camera, dX, dY);
 }
 
 int main(int argc, char** argv)
 {
 	GLFWwindow* window = CreateWindow_1(800, 600, "Model Viewer Camera");
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	/*if (!isModelViewer)
+	{
+		glfwSetCursorPosCallback(window, processMouse);
+	}*/
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	int numMultiSamples;
@@ -495,6 +569,7 @@ int main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 
 	glUseProgram(shaderProgram);
+
 
 	while (!glfwWindowShouldClose(window))
 	{

@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="FlyThroughCamera.h" />
     <ClInclude Include="ModelViewerCamera.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="texture.h" />

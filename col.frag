@@ -98,9 +98,9 @@ float CalculateSpotIllumination()
 void main()
 {
 	 //fragColour = vec4(col, 1.f);
-	//float phong = CalculateDirectionIllumination();
+	float phong = CalculateDirectionIllumination();
 	//float phong = CalculatePositionalIllumination();
-	float phong = CalculateSpotIllumination();
+	//float phong = CalculateSpotIllumination();
 	//fragColour = vec4(phong * col * lightColour, 1.f);
 	//vec4 textureColour;
 	//if (useTexture1 == 1) {
