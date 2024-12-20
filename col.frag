@@ -10,6 +10,7 @@ uniform vec3 lightDirection;
 uniform vec3 lightPos;
 uniform vec3 camPos;
 uniform sampler2D Texture;
+uniform float light_decider;
 //uniform sampler2D Texture2;
 
 uniform int useTexture1;
@@ -98,9 +99,13 @@ float CalculateSpotIllumination()
 void main()
 {
 	 //fragColour = vec4(col, 1.f);
-	float phong = CalculateDirectionIllumination();
-	//float phong = CalculatePositionalIllumination();
-	//float phong = CalculateSpotIllumination();
+	 float phong;
+	 if (light_decider == 1)
+		phong = CalculateDirectionIllumination();
+	if (light_decider == 2)
+		phong = CalculatePositionalIllumination();
+	if (light_decider == 3)
+		phong = CalculateSpotIllumination();
 	//fragColour = vec4(phong * col * lightColour, 1.f);
 	//vec4 textureColour;
 	//if (useTexture1 == 1) {

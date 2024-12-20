@@ -17,6 +17,7 @@
 
 
 boolean isModelViewer = true;
+int light_iter = 1;
 
 
 // Ô²×¶²ÎÊý
@@ -336,6 +337,13 @@ void processKeyboard(GLFWwindow* window)
 		lightDirection = Camera.Front;
 		lightPos = Camera.Position;
 	}
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	{
+		// Change between the three types of light
+		light_iter = light_iter % 3;
+		light_iter++;
+	}
 	//std::cout << "The camera is: " << (int) isModelViewer << std::endl;
 	bool cam_changed = false;
 	float x = 0.f, y = 0.f;
@@ -576,6 +584,8 @@ int main(int argc, char** argv)
 		glUniform3f(glGetUniformLocation(shaderProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
 		glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
+		glUniform1f(glGetUniformLocation(shaderProgram, "light_decider"), light_iter);
+		
 
 		/*glm::mat4 model = glm::mat4(1.f);
 		model = glm::translate(model, cube_pos);
