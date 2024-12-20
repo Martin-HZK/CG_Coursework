@@ -10,6 +10,7 @@
 #include "camera.h"
 #include "shader.h"
 #include "window.h"
+#include "texture.h"
 #include <corecrt_math_defines.h>
 #include <vector>
 
@@ -32,7 +33,8 @@ void generateConeVertices() {
 	coneVertices.push_back(0.0f); // nx
 	coneVertices.push_back(-1.0f); // ny
 	coneVertices.push_back(0.0f); // nz
-
+	coneVertices.push_back(0.5f); // u
+	coneVertices.push_back(0.5f); // v
 	// 底面顶点
 	for (int i = 0; i <= segments_cone; ++i) {
 		float theta = 2.0f * M_PI * i / segments_cone;
@@ -47,6 +49,8 @@ void generateConeVertices() {
 		coneVertices.push_back(0.0f); // nx
 		coneVertices.push_back(-1.0f); // ny
 		coneVertices.push_back(0.0f); // nz
+		coneVertices.push_back((x / radius + 1.0f) * 0.5f); // u
+		coneVertices.push_back((z / radius + 1.0f) * 0.5f); // v
 	}
 
 	// 侧面顶点
@@ -68,6 +72,8 @@ void generateConeVertices() {
 		coneVertices.push_back(nx);
 		coneVertices.push_back(ny);
 		coneVertices.push_back(nz);
+		coneVertices.push_back((float)i / segments_cone); // u
+		coneVertices.push_back(0.0f); // v
 
 		// 锥顶点
 		coneVertices.push_back(0.0f);
@@ -79,6 +85,8 @@ void generateConeVertices() {
 		coneVertices.push_back(nx);
 		coneVertices.push_back(ny);
 		coneVertices.push_back(nz);
+		coneVertices.push_back((float)i / segments_cone); // u
+		coneVertices.push_back(1.0f); // v
 	}
 }
 
@@ -118,6 +126,11 @@ void generateTorusVertices() {
 			float g = 0.5f + 0.5f * ny;
 			float b = 0.5f + 0.5f * nz;
 
+			// UV坐标
+			float u = (float)i / segmentsMajor;
+			float v = (float)j / segmentsMinor;
+
+
 			// 添加顶点数据
 			torusVertices.push_back(x);  // 位置
 			torusVertices.push_back(y);
@@ -128,6 +141,8 @@ void generateTorusVertices() {
 			torusVertices.push_back(nx); // 法线
 			torusVertices.push_back(ny);
 			torusVertices.push_back(nz);
+			torusVertices.push_back(u);  // UV
+			torusVertices.push_back(v);
 		}
 	}
 
@@ -186,6 +201,10 @@ void generateSphereVertices() {
 			float r = 0.5f + 0.5f * nx;
 			float g = 0.5f + 0.5f * ny;
 			float b = 0.5f + 0.5f * nz;
+			// UV坐标
+			float u = (float)lon / segmentsLongitude;
+			float v = (float)lat / segmentsLatitude;
+
 
 			// 添加顶点
 			sphereVertices.push_back(x);  // 位置
@@ -197,6 +216,8 @@ void generateSphereVertices() {
 			sphereVertices.push_back(nx); // 法线
 			sphereVertices.push_back(ny);
 			sphereVertices.push_back(nz);
+			sphereVertices.push_back(u);  // UV
+			sphereVertices.push_back(v);
 		}
 	}
 
@@ -253,6 +274,10 @@ void generateSphereVertices_1() {
 			float r = 0.5f + 0.5f * nx;
 			float g = 0.5f + 0.5f * ny;
 			float b = 0.5f + 0.5f * nz;
+			// UV坐标
+			float u = (float)lon / segmentsLongitude_1;
+			float v = (float)lat / segmentsLatitude_1;
+
 
 			// 添加顶点
 			sphereVertices_1.push_back(x);  // 位置
@@ -264,6 +289,8 @@ void generateSphereVertices_1() {
 			sphereVertices_1.push_back(nx); // 法线
 			sphereVertices_1.push_back(ny);
 			sphereVertices_1.push_back(nz);
+			sphereVertices_1.push_back(u);  // UV
+			sphereVertices_1.push_back(v);
 		}
 	}
 
@@ -350,7 +377,7 @@ void processKeyboard(GLFWwindow* window)
 
 int main(int argc, char** argv)
 {
-	GLFWwindow* window = CreateWindow(800, 600, "Model Viewer Camera");
+	GLFWwindow* window = CreateWindow_1(800, 600, "Model Viewer Camera");
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	int numMultiSamples;
@@ -363,6 +390,8 @@ int main(int argc, char** argv)
 	//Camera.Pitch = -8.5f;
 	//Camera.Yaw = -12.f;
 	MoveAndOrientCamera(Camera, cube_pos, cam_dist, 0.f, 0.f);
+	GLuint texture = setup_texture("cone.bmp");
+	//GLuint texture = setup_texture("mars.bmp");
 
 // generate cone vertex
 	generateConeVertices();
@@ -392,12 +421,14 @@ int main(int argc, char** argv)
 	glBindVertexArray(VAO[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * coneVertices.size(), &coneVertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	
@@ -409,12 +440,14 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, torusIndices.size() * sizeof(unsigned int), &torusIndices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -426,12 +459,14 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[1]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), &sphereIndices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -443,12 +478,14 @@ int main(int argc, char** argv)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO[2]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof(unsigned int), &sphereIndices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -478,6 +515,7 @@ int main(int argc, char** argv)
 		modelCone = glm::translate(modelCone, cube_pos);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelCone));
 
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO[0]);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, segments_cone + 2);
 		glDrawArrays(GL_TRIANGLE_STRIP, segments_cone + 2, (segments_cone + 1) * 2);
@@ -489,7 +527,7 @@ int main(int argc, char** argv)
 		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
-
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO[1]);
 		glDrawElements(GL_TRIANGLES, torusIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -502,6 +540,7 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
 
 		// 绑定 VAO 并绘制球体
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO[2]);
 		glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -512,6 +551,7 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere_1));
 
 		// 绑定 VAO 并绘制球体
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glBindVertexArray(VAO[3]);
 		glDrawElements(GL_TRIANGLES, sphereIndices_1.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);

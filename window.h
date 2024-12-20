@@ -7,7 +7,7 @@ void framebuffer_size_callback(GLFWwindow* window, int w, int h)
 	glViewport(0, 0, w, h);
 }
 
-GLFWwindow* CreateWindow(int w, int h, const char* title)
+GLFWwindow* CreateWindow_1(int w, int h, const char* title)
 {
 	//Initialize the library, allocate resources
 	glfwInit();

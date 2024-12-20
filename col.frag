@@ -3,11 +3,13 @@
 in vec3 col;
 in vec3 nor;
 in vec3 FragPos;
+in vec2 tex;
 
 uniform vec3 lightColour;
 uniform vec3 lightDirection;
 uniform vec3 lightPos;
 uniform vec3 camPos;
+uniform sampler2D Texture;
 
 out vec4 fragColour;
 
@@ -31,7 +33,8 @@ float CalculateDirectionIllumination()
 
 void main()
 {
-	 fragColour = vec4(col, 1.f);
+	 //fragColour = vec4(col, 1.f);
 	//float phong = CalculateDirectionIllumination();
 	//fragColour = vec4(phong * col * lightColour, 1.f);
+	fragColour = texture(Texture, tex);
 }
