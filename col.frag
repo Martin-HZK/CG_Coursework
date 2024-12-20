@@ -9,8 +9,8 @@ uniform vec3 lightColour;
 uniform vec3 lightDirection;
 uniform vec3 lightPos;
 uniform vec3 camPos;
-uniform sampler2D Texture1;
-uniform sampler2D Texture2;
+uniform sampler2D Texture;
+//uniform sampler2D Texture2;
 
 uniform int useTexture1;
 
@@ -37,11 +37,16 @@ float CalculateDirectionIllumination()
 void main()
 {
 	 //fragColour = vec4(col, 1.f);
-	//float phong = CalculateDirectionIllumination();
+	float phong = CalculateDirectionIllumination();
 	//fragColour = vec4(phong * col * lightColour, 1.f);
-	if (useTexture1 == 1) {
-		fragColour = texture(Texture1, tex);
-	} else {
-		fragColour = texture(Texture2, tex);
-	}
+	vec4 textureColor;
+	//if (useTexture1 == 1) {
+		//fragColour = texture(Texture1, tex);
+	//} else {
+		//fragColour = texture(Texture2, tex);
+	//}
+	fragColour = texture(Texture, tex);
+	
+    //fragColour = vec4(phong * textureColour.rgb * lightColour, textureColour.a);
+
 }

@@ -18,5 +18,5 @@ void main()
 	FragPos = vec3(model * vec4(aPos, 1.f));
 	col = aCol;
 	tex = aTex.xy;
-	//nor = mat3(transpose(inverse(model))) * aNor;
+	nor = mat3(transpose(inverse(model))) * aNor;
 }
