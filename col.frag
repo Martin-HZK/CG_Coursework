@@ -34,10 +34,73 @@ float CalculateDirectionIllumination()
 	return i;
 }
 
+float CalculatePositionalIllumination()
+{
+	float amb = 0.1f;
+
+	vec3 Nnor = normalize(nor);
+	vec3 NToLight = normalize(lightPos - FragPos);
+	float diff = max(dot(Nnor, NToLight), 0.f);
+
+	vec3 NFromLight = -NToLight;
+	vec3 refDir = reflect(NFromLight, Nnor);
+	vec3 NcamDir = normalize(camPos - FragPos);
+	float spec = pow(max(dot(NcamDir, refDir), 0.f), 128);
+
+	float d = length(lightPos - FragPos);
+	float c = 1.5f;
+	float l = .05f;
+	float q = .02f;
+	float att = 1.f / (c + (l*d) + (q*(d*d)));
+
+	float i = (amb + diff + spec) * att;
+
+	return i;
+}
+
+
+float CalculateSpotIllumination()
+{
+	float amb = 0.1f;
+
+	vec3 Nnor = normalize(nor);
+	vec3 NToLight = normalize(lightPos - FragPos);
+	float diff = max(dot(Nnor, NToLight), 0.f);
+
+	vec3 NFromLight = -NToLight;
+	vec3 refDir = reflect(NFromLight, Nnor);
+	vec3 NcamDir = normalize(camPos - FragPos);
+	float spec = pow(max(dot(NcamDir, refDir), 0.f), 128);
+
+	float d = length(lightPos - FragPos);
+	float c = 1.5f;
+	float l = .05f;
+	float q = .02f;
+	float att = 1.f / (c + (l*d) + (q*(d*d)));
+
+	float phi = cos(radians(15.f));
+	vec3 NSpotDir = normalize(lightDirection);
+	float theta = dot(NFromLight, NSpotDir);
+
+	float i;
+	if(theta > phi)
+	{
+		i = (amb + diff + spec) * att;
+	}
+	else
+	{
+		i = (amb) * att;
+	}
+
+	return i;
+}
+
 void main()
 {
 	 //fragColour = vec4(col, 1.f);
-	float phong = CalculateDirectionIllumination();
+	//float phong = CalculateDirectionIllumination();
+	//float phong = CalculatePositionalIllumination();
+	float phong = CalculateSpotIllumination();
 	//fragColour = vec4(phong * col * lightColour, 1.f);
 	//vec4 textureColour;
 	//if (useTexture1 == 1) {

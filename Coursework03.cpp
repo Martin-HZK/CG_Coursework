@@ -329,6 +329,7 @@ void processKeyboard(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		lightDirection = Camera.Front;
+		lightPos = Camera.Position;
 	}
 
 	bool cam_changed = false;
@@ -507,8 +508,7 @@ int main(int argc, char** argv)
 		glUniform3f(glGetUniformLocation(shaderProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
 		glUniform3f(glGetUniformLocation(shaderProgram, "lightColour"), 1.f, 1.f, 1.f);
 		glUniform3f(glGetUniformLocation(shaderProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
-		/*glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);*/
+		glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
 
 		/*glm::mat4 model = glm::mat4(1.f);
