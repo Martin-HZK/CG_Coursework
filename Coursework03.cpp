@@ -390,8 +390,10 @@ int main(int argc, char** argv)
 	//Camera.Pitch = -8.5f;
 	//Camera.Yaw = -12.f;
 	MoveAndOrientCamera(Camera, cube_pos, cam_dist, 0.f, 0.f);
-	GLuint texture = setup_texture("cone.bmp");
-	//GLuint texture = setup_texture("mars.bmp");
+	GLuint cone = setup_texture("cone.bmp");
+	GLuint ringball = setup_texture("ring.bmp");
+	GLuint mars = setup_texture("mars.bmp");
+
 
 // generate cone vertex
 	generateConeVertices();
@@ -505,6 +507,9 @@ int main(int argc, char** argv)
 		glUniform3f(glGetUniformLocation(shaderProgram, "lightDirection"), lightDirection.x, lightDirection.y, lightDirection.z);
 		glUniform3f(glGetUniformLocation(shaderProgram, "lightColour"), 0.f, 0.f, 1.f);
 		glUniform3f(glGetUniformLocation(shaderProgram, "camPos"), Camera.Position.x, Camera.Position.y, Camera.Position.z);
+		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);
+		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);
+
 
 		/*glm::mat4 model = glm::mat4(1.f);
 		model = glm::translate(model, cube_pos);
@@ -515,7 +520,10 @@ int main(int argc, char** argv)
 		modelCone = glm::translate(modelCone, cube_pos);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelCone));
 
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, cone);
+		/*glUniform1i(glGetUniformLocation(shaderProgram, "Texture1"), 0);
+		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);*/
 		glBindVertexArray(VAO[0]);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, segments_cone + 2);
 		glDrawArrays(GL_TRIANGLE_STRIP, segments_cone + 2, (segments_cone + 1) * 2);
@@ -527,7 +535,10 @@ int main(int argc, char** argv)
 		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, ringball);
+		/*glUniform1i(glGetUniformLocation(shaderProgram, "Texture1"), 0);
+		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 0);*/
 		glBindVertexArray(VAO[1]);
 		glDrawElements(GL_TRIANGLES, torusIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -540,7 +551,10 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
 
 		// 绑定 VAO 并绘制球体
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, ringball);
+		/*glUniform1i(glGetUniformLocation(shaderProgram, "Textur2"), 0);
+		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 0);*/
 		glBindVertexArray(VAO[2]);
 		glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -551,7 +565,10 @@ int main(int argc, char** argv)
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere_1));
 
 		// 绑定 VAO 并绘制球体
-		glBindTexture(GL_TEXTURE_2D, texture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mars);
+		/*glUniform1i(glGetUniformLocation(shaderProgram, "Texture1"), 0);
+		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);*/
 		glBindVertexArray(VAO[3]);
 		glDrawElements(GL_TRIANGLES, sphereIndices_1.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);

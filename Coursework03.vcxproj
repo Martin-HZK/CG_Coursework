@@ -150,7 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="cone.bmp" />
+    <Image Include="jubilee.bmp" />
     <Image Include="mars.bmp" />
+    <Image Include="ring.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
