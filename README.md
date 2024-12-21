@@ -11,8 +11,8 @@
 
 
 ### ModelViewerCamera ONLY
-* `$&uaar;$`: Camera Up 
-* `$&daar;$`: Camera Down
-* `$&rarr;$`: Camera Right
-* `$&larr;$`: Camera Left
+* `$\uaar$`: Camera Up 
+* `$\darr$`: Camera Down
+* `$\rarr$`: Camera Right
+* `$\larr$`: Camera Left
 * `Y`: Start Auto Orbit Revolution
