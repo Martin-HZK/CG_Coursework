@@ -15,4 +15,4 @@
 * `↓`: Camera Down
 * `←`: Camera Right
 * `→`: Camera Left
-* `Y`: Start Auto Orbit Revolution
+* `Y`: Start/End Auto Orbit Revolution
