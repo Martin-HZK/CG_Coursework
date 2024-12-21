@@ -484,7 +484,7 @@ int main(int argc, char** argv)
 	InitCamera(Camera);
 	//Camera.Pitch = -8.5f;
 	//Camera.Yaw = -12.f;
-	MoveAndOrientCamera(Camera, cube_pos, cam_dist, 0.f, 0.f);
+	MoveAndOrientCamera(Camera, cube_pos, cam_dist, 0.f, -20.f);
 	GLuint cone = setup_texture("cone.bmp");
 	GLuint ringball = setup_texture("texture01.bmp");
 	GLuint mars = setup_texture("mars.bmp");

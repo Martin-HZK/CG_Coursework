@@ -35,7 +35,7 @@ void InitCamera(SCamera& in)
 {
 	in.Front = glm::vec3(0.0f, 0.0f, -1.0f);
 	in.Position = glm::vec3(0.0f, 0.0f, 0.0f);
-	in.Up = glm::vec3(0.0f, 1.0f, 0.0f);
+	in.Up = glm::vec3(0.0f, 1.5f, 0.0f);
 	in.WorldUp = in.Up;
 	in.Right = glm::normalize(glm::cross(in.Front, in.WorldUp));
 
