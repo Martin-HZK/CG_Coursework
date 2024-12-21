@@ -17,6 +17,7 @@
 
 
 boolean isModelViewer = true;
+bool isAutoRotate = false;
 int light_iter = 1;
 
 
@@ -423,6 +424,10 @@ void processKeyboard(GLFWwindow* window)
 	{
 		MoveCamera(Camera, SCamera::RIGHT, deltaTime);
 	}
+	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+	{
+		isAutoRotate = !isAutoRotate;
+	}
 
 
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
@@ -466,6 +471,12 @@ void processMouse(GLFWwindow* window, double x, double y)
 
 	OrientCamera(Camera, dX, dY, deltaTime);
 }
+
+//void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+//	if (key == GLFW_KEY_Y) {
+//		isAutoRotate = !isAutoRotate; // ÇÐ»»×Ô¶¯Ðý×ª×´Ì¬
+//	}
+//}
 
 int main(int argc, char** argv)
 {
@@ -599,6 +610,7 @@ int main(int argc, char** argv)
 		{
 			glfwSetCursorPosCallback(window, processMouse);
 		}
+		
 		glClearColor(.902f, .863f, .902f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -694,7 +706,11 @@ int main(int argc, char** argv)
 		glm::mat4 projection = glm::mat4(1.f);
 		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, .5f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		
+		std::cout << "The auto state is: " << (int) isAutoRotate << std::endl;
+		if (isAutoRotate && isModelViewer) {
+			MoveAndOrientCamera(Camera, cube_pos, cam_dist, -.01f, 0.f);
+		}
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
