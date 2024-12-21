@@ -587,6 +587,11 @@ int main(int argc, char** argv)
 		glUniform1f(glGetUniformLocation(shaderProgram, "light_decider"), light_iter);
 		
 
+
+		glm::mat4 co_translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 0.f, 0.f));
+		glm::mat4 co_rotation = glm::rotate(glm::mat4(1.0f), glm::radians(-30.0f), glm::vec3(0.0f, 1.0f, 0.0f));  // 假设绕 Y 轴旋转
+		glm::mat4 co_transformation = co_translation * co_rotation;
+
 		/*glm::mat4 model = glm::mat4(1.f);
 		model = glm::translate(model, cube_pos);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
@@ -594,12 +599,13 @@ int main(int argc, char** argv)
 		// Render the cone
 		glm::mat4 modelCone = glm::mat4(1.f);
 		modelCone = glm::translate(modelCone, cube_pos);
+		modelCone = glm::rotate(modelCone, glm::radians(-30.0f), glm::vec3(.0f, .0f, 1.0f));  // 同样旋转
+		//modelCone = modelCone * co_transformation;
+
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelCone));
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, cone);
-		/*glUniform1i(glGetUniformLocation(shaderProgram, "Texture1"), 0);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);*/
 		glBindVertexArray(VAO[0]);
 		glDrawArrays(GL_TRIANGLE_FAN, 0, segments_cone + 2);
 		glDrawArrays(GL_TRIANGLE_STRIP, segments_cone + 2, (segments_cone + 1) * 2);
@@ -607,14 +613,16 @@ int main(int argc, char** argv)
 
 		// print the vertices of modelRing
 		glm::mat4 modelRing = glm::mat4(1.f);
-		modelRing = glm::translate(modelRing, glm::vec3(0.0f, .5f, 0.0f)); // Translate the ring above the cone
-		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
+		//modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(1.f, 0.f, 0.f));  // 同样的旋转
+		modelRing = glm::translate(modelRing, glm::vec3(.25f, .5f, 0.f)); // Translate the ring above the cone
+		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(.0f, 1.0f, 0.0f));
+
+		//modelRing = modelRing * co_transformation;
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, ringball);
-		/*glUniform1i(glGetUniformLocation(shaderProgram, "Texture1"), 0);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 0);*/
 		glBindVertexArray(VAO[1]);
 		glDrawElements(GL_TRIANGLES, torusIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -623,28 +631,26 @@ int main(int argc, char** argv)
 
 		// 设置模型矩阵
 		glm::mat4 modelSphere = glm::mat4(1.f);
-		modelSphere = glm::translate(modelSphere, glm::vec3(0.28f, .65f, 0.0f));
+		modelSphere = glm::translate(modelSphere, glm::vec3(0.1f, .7f, 0.f));
+		//modelSphere = modelSphere * co_transformation;
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
 
 		// 绑定 VAO 并绘制球体
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, ringball);
-		/*glUniform1i(glGetUniformLocation(shaderProgram, "Textur2"), 0);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 0);*/
 		glBindVertexArray(VAO[2]);
 		glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		// 设置模型矩阵
 		glm::mat4 modelSphere_1 = glm::mat4(1.f);
-		modelSphere_1 = glm::translate(modelSphere_1, glm::vec3(1.0f, 1.5f, 0.0f));
+		modelSphere_1 = glm::translate(modelSphere_1, glm::vec3(.0f, 1.f, .5f));
+		//modelSphere_1 = modelSphere_1 * co_transformation;
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere_1));
 
 		// 绑定 VAO 并绘制球体
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, mars);
-		/*glUniform1i(glGetUniformLocation(shaderProgram, "Texture1"), 0);
-		glUniform1i(glGetUniformLocation(shaderProgram, "useTexture1"), 1);*/
 		glBindVertexArray(VAO[3]);
 		glDrawElements(GL_TRIANGLES, sphereIndices_1.size(), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
