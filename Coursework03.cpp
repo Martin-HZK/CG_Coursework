@@ -19,7 +19,8 @@
 boolean isModelViewer = true;
 bool isAutoRotate = false;
 int light_iter = 1;
-
+bool isSelfRotateRing = false;
+float ringRotationAngle = 0.0f; // 定义旋转角度变量
 
 // 圆锥参数
 const float radius = 0.5f; // 底面半径
@@ -428,6 +429,10 @@ void processKeyboard(GLFWwindow* window)
 	{
 		isAutoRotate = !isAutoRotate;
 	}
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+	{
+		isSelfRotateRing = !isSelfRotateRing;
+	}
 
 
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
@@ -706,10 +711,18 @@ int main(int argc, char** argv)
 		glm::mat4 projection = glm::mat4(1.f);
 		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, .5f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		std::cout << "The auto state is: " << (int) isAutoRotate << std::endl;
+		//std::cout << "The auto state is: " << (int) isAutoRotate << std::endl;
 		if (isAutoRotate && isModelViewer) {
 			MoveAndOrientCamera(Camera, cube_pos, cam_dist, -.01f, 0.f);
 		}
+		std::cout << "The selfrotate state is: " << (int)isSelfRotateRing << std::endl;
+		if (isSelfRotateRing) {
+			ringRotationAngle += 0.01f; // 每帧增加旋转角度
+			modelRing = glm::rotate(modelRing, ringRotationAngle, glm::vec3(0.f, 1.f, 0.f));
+
+		}
+		//modelRing = glm::rotate(modelRing, ringRotationAngle, glm::vec3(0.f, 1.f, 0.f));
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
