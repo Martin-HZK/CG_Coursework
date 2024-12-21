@@ -17,7 +17,8 @@ uniform int useTexture1;
 
 out vec4 fragColour;
 
-float CalculateDirectionIllumination()
+
+/*float CalculateDirectionIllumination()
 {
 	float amb = 0.1f;
 
@@ -33,6 +34,22 @@ float CalculateDirectionIllumination()
 	float i = amb + diff + spec;
 
 	return i;
+}*/
+float CalculateDirectionIllumination()
+{
+    float amb = 0.1f;
+
+    vec3 Nnor = normalize(nor);
+    vec3 Ntolight = normalize(-lightDirection);
+    float diff = max(dot(Nnor, Ntolight), 0.f);
+
+    vec3 refDir = reflect(-Ntolight, Nnor);
+    vec3 camDir = normalize(camPos - FragPos);
+    float spec = pow(max(dot(camDir, refDir), 0.f), 128); // 调整高光指数为32
+    
+    float i = amb + diff + spec;
+
+    return i;
 }
 
 float CalculatePositionalIllumination()
@@ -122,6 +139,6 @@ void main()
     vec3 finalColour = phong * textureColour.rgb * lightColour;
 
     // Output final color
-    fragColour = vec4(finalColour, textureColour.a);
+    fragColour = vec4(finalColour, 1.0f);
 
 }

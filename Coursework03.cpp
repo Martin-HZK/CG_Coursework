@@ -127,6 +127,12 @@ void generateTorusVertices() {
 			float ny = cosPhi * sinTheta;
 			float nz = sinPhi;
 
+			// 归一化法线
+			float length = sqrt(nx * nx + ny * ny + nz * nz);
+			nx /= length;
+			ny /= length;
+			nz /= length;
+
 			// 顶点颜色
 			float r = 0.5f + 0.5f * nx;
 			float g = 0.5f + 0.5f * ny;
@@ -202,6 +208,15 @@ void generateSphereVertices() {
 			float nx = sinTheta * cosPhi;
 			float ny = cosTheta;
 			float nz = sinTheta * sinPhi;
+			/*float nx = x;
+			float ny = y;
+			float nz = z;*/
+				
+			// 法线归一化
+			float length = sqrt(nx * nx + ny * ny + nz * nz);
+			nx /= length;
+			ny /= length;
+			nz /= length;
 
 			// 顶点颜色
 			float r = 0.5f + 0.5f * nx;
@@ -210,7 +225,8 @@ void generateSphereVertices() {
 			// UV坐标
 			float u = (float)lon / segmentsLongitude;
 			float v = (float)lat / segmentsLatitude;
-
+			 
+			glm::vec3 normal = glm::normalize(glm::vec3(x, y, z));
 
 			// 添加顶点
 			sphereVertices.push_back(x);  // 位置
@@ -219,9 +235,12 @@ void generateSphereVertices() {
 			sphereVertices.push_back(r);  // 颜色
 			sphereVertices.push_back(g);
 			sphereVertices.push_back(b);
-			sphereVertices.push_back(nx); // 法线
-			sphereVertices.push_back(ny);
-			sphereVertices.push_back(nz);
+			//sphereVertices.push_back(nx); // 法线
+			//sphereVertices.push_back(ny);
+			//sphereVertices.push_back(nz);
+			sphereVertices.push_back(normal.x); // 法线
+			sphereVertices.push_back(normal.y);
+			sphereVertices.push_back(normal.z);
 			sphereVertices.push_back(u);  // UV
 			sphereVertices.push_back(v);
 		}
@@ -275,6 +294,12 @@ void generateSphereVertices_1() {
 			float nx = sinTheta * cosPhi;
 			float ny = cosTheta;
 			float nz = sinTheta * sinPhi;
+
+			// 归一化法线
+			float length = sqrt(nx * nx + ny * ny + nz * nz);
+			nx /= length;
+			ny /= length;
+			nz /= length;
 
 			// 顶点颜色
 			float r = 0.5f + 0.5f * nx;
@@ -569,7 +594,7 @@ int main(int argc, char** argv)
 
 	while (!glfwWindowShouldClose(window))
 	{
-
+		//std::cout << "Light iter: " << light_iter << std::endl;
 		processKeyboard(window);
 		if (!isModelViewer)
 		{
