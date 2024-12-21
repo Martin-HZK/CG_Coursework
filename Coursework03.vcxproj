@@ -154,6 +154,7 @@
     <Image Include="jubilee.bmp" />
     <Image Include="mars.bmp" />
     <Image Include="ring.bmp" />
+    <Image Include="texture01.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -42,5 +42,31 @@
     <ClInclude Include="window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="bitmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlyThroughCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="cone.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="jubilee.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="mars.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="ring.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="texture01.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

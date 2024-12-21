@@ -4,7 +4,7 @@
 #include <glm/glm/glm.hpp>
 #include "camera.h"
 
-float cam_dist = 1.f;
+float cam_dist = 4.f;
 
 void MoveAndOrientCamera(SCamera& in, glm::vec3 target, float distance, float xoffset, float yoffset)
 {

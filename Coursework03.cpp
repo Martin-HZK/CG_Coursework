@@ -348,7 +348,6 @@ void generateSphereVertices_1() {
 glm::vec3 cube_pos = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 lightDirection = glm::vec3(0.1f, -.81f, -.61f);
 glm::vec3 lightPos = glm::vec3(2.f, 6.f, 7.f);
-
 SCamera Camera;
 float deltaTime = 0.016f; // 每帧间隔时间
 
@@ -487,7 +486,7 @@ int main(int argc, char** argv)
 	//Camera.Yaw = -12.f;
 	MoveAndOrientCamera(Camera, cube_pos, cam_dist, 0.f, 0.f);
 	GLuint cone = setup_texture("cone.bmp");
-	GLuint ringball = setup_texture("ring.bmp");
+	GLuint ringball = setup_texture("texture01.bmp");
 	GLuint mars = setup_texture("mars.bmp");
 
 
@@ -600,7 +599,7 @@ int main(int argc, char** argv)
 		{
 			glfwSetCursorPosCallback(window, processMouse);
 		}
-		glClearColor(.0f, .0f, .0f, 1.f);
+		glClearColor(.902f, .863f, .902f, 1.f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -623,8 +622,11 @@ int main(int argc, char** argv)
 		*/
 		// Render the cone
 		glm::mat4 modelCone = glm::mat4(1.f);
+
 		modelCone = glm::translate(modelCone, cube_pos);
 		modelCone = glm::rotate(modelCone, glm::radians(-30.0f), glm::vec3(.0f, .0f, 1.0f));  // 同样旋转
+		//modelCone = glm::rotate(modelCone, glm::radians(-40.0f), glm::vec3(1.0f, 1.f, .0f));  // 同样旋转
+
 		//modelCone = modelCone * co_transformation;
 
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelCone));
@@ -642,7 +644,10 @@ int main(int argc, char** argv)
 		//modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(1.f, 0.f, 0.f));  // 同样的旋转
 		modelRing = glm::translate(modelRing, glm::vec3(.25f, .5f, 0.f)); // Translate the ring above the cone
 		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(.0f, 1.0f, 0.0f));
+		modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(.0f, 1.f, 0.0f));  // 同样旋转
+		//modelRing = glm::rotate(modelRing, glm::radians(-50.0f), glm::vec3(1.0f, 1.0f, .0f));  // 同样旋转
+		//modelRing = glm::translate(modelRing, glm::vec3(.1f, -.3f, .0f)); // Translate the ring above the cone
+
 
 		//modelRing = modelRing * co_transformation;
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
@@ -657,6 +662,7 @@ int main(int argc, char** argv)
 		// 设置模型矩阵
 		glm::mat4 modelSphere = glm::mat4(1.f);
 		modelSphere = glm::translate(modelSphere, glm::vec3(0.1f, .7f, 0.f));
+
 		//modelSphere = modelSphere * co_transformation;
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
 
