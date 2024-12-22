@@ -11,6 +11,7 @@ uniform vec3 lightPos;
 uniform vec3 camPos;
 uniform sampler2D Texture;
 uniform float light_decider;
+uniform int isLightOn;
 //uniform sampler2D Texture2;
 
 uniform int useTexture1;
@@ -98,7 +99,7 @@ float CalculateSpotIllumination()
 
 void main()
 {
-	 //fragColour = vec4(col, 1.f);
+	 // fragColour = vec4(col, 1.f);
 	 float phong;
 	 if (light_decider == 1)
 		phong = CalculateDirectionIllumination();
@@ -106,25 +107,25 @@ void main()
 		phong = CalculatePositionalIllumination();
 	if (light_decider == 3)
 		phong = CalculateSpotIllumination();
-	//if (light_decider == 4)
-		
-	//fragColour = vec4(phong * col * lightColour, 1.f);
 
-	//vec4 textureColour;
-	//if (useTexture1 == 1) {
-		//fragColour = texture(Texture1, tex);
-	//} else {
-		//fragColour = texture(Texture2, tex);
-	//}
-	//fragColour = texture(Texture, tex);
+		
+	// fragColour = vec4(phong * col * lightColour, 1.f);
+
+	// fragColour = texture(Texture, tex);
 	
-     // Sample texture color
+     // Original texture color
     vec4 textureColour = texture(Texture, tex);
 
     // Combine texture color with lighting
     vec3 finalColour = phong * textureColour.rgb * lightColour;
-
+	
     // Output final color
-    fragColour = vec4(finalColour, 1.0f);
+	if (isLightOn == 1) {
+		fragColour = vec4(finalColour, 1.0f);
+	}
+	else {
+		finalColour = 0.1f * (1, 1, 1) * textureColour.rgb;
+		fragColour = vec4(finalColour, 0.1f);
+	}
 
 }

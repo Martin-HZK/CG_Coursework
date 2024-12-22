@@ -19,6 +19,7 @@
 boolean isModelViewer = true;
 bool isAutoRotate = false;
 int light_iter = 1;
+boolean isLightOn = true;
 bool isSelfRotateRing = false;
 float ringRotationAngle = 0.0f;
 
@@ -327,17 +328,31 @@ void processKeyboard(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && isLightOn)
 	{
 		lightDirection = Camera.Front;
 		lightPos = Camera.Position;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && isLightOn)
 	{
-		// Change between the three types of light
-		light_iter = light_iter % 3;
-		light_iter++;
+		light_iter = 1;
+	}
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && isLightOn)
+	{
+		light_iter = 2;
+	}
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && isLightOn)
+	{
+		light_iter = 3;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
+		isLightOn = false;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
+		isLightOn = true;
 	}
 	//std::cout << "The camera is: " << (int) isModelViewer << std::endl;
 	bool cam_changed = false;
@@ -398,14 +413,11 @@ void processKeyboard(GLFWwindow* window)
 	{
 		isAutoRotate = !isAutoRotate;
 	}
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-	{
-		isSelfRotateRing = !isSelfRotateRing;
-	}
+
 
 
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
-		isModelViewer = !isModelViewer;
+		isModelViewer = true;
 
 		// Change Camera to the default start state
 		Camera.Position = glm::vec3(0.0f, 0.0f,3.0f);
@@ -414,6 +426,19 @@ void processKeyboard(GLFWwindow* window)
 		Camera.Front = glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f));
 
 		
+		Camera.Right = glm::normalize(glm::cross(Camera.Front, Camera.WorldUp));
+		Camera.Up = glm::normalize(glm::cross(Camera.Right, Camera.Front));
+	}
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+		isModelViewer = false;
+
+		// Change Camera to the default start state
+		Camera.Position = glm::vec3(0.0f, 0.0f, 3.0f);
+		Camera.Yaw = -90.0f;
+		Camera.Pitch = 0.0f;
+		Camera.Front = glm::normalize(glm::vec3(0.0f, 0.0f, -1.0f));
+
+
 		Camera.Right = glm::normalize(glm::cross(Camera.Front, Camera.WorldUp));
 		Camera.Up = glm::normalize(glm::cross(Camera.Right, Camera.Front));
 	}
@@ -456,7 +481,7 @@ int main(int argc, char** argv)
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	int numMultiSamples;
 	glGetIntegerv(GL_MAX_SAMPLES, &numMultiSamples);
-	std::cout << "Max number of samples is " << numMultiSamples << std::endl;
+	//std::cout << "Max number of samples is " << numMultiSamples << std::endl;
 
 	unsigned int shaderProgram = LoadShader("mvp.vert", "col.frag");
 
@@ -571,7 +596,7 @@ int main(int argc, char** argv)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		std::cout << "Light iter: " << light_iter << std::endl;
+		//std::cout << "Light iter: " << light_iter << std::endl;
 		processKeyboard(window);
 		if (!isModelViewer)
 		{
@@ -588,12 +613,13 @@ int main(int argc, char** argv)
 		glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
 		glUniform1f(glGetUniformLocation(shaderProgram, "light_decider"), light_iter);
+		//std::cout << "The light is :" << (int)isLightOn << std::endl;
+		glUniform1i(glGetUniformLocation(shaderProgram, "isLightOn"), (int) isLightOn);
 		
 
 		// Draw the cone
 		glm::mat4 modelCone = glm::mat4(1.f);
 
-		//modelCone = glm::translate(modelCone, cube_pos);
 		modelCone = glm::rotate(modelCone, glm::radians(-30.0f), glm::vec3(.0f, .0f, 1.0f)); 
 		//modelCone = glm::rotate(modelCone, glm::radians(-40.0f), glm::vec3(.0f, 0.f, .0f));
 
