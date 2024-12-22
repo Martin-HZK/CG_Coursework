@@ -8,7 +8,7 @@
 * `R`: Zoom in
 * `L`: Change Light Type
 * `C`: Change Camera Type
-
+* `N`: Turn off all the lights
 
 ### ModelViewerCamera ONLY
 * `↑`: Camera Up 
