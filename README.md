@@ -20,3 +20,9 @@
 * `←`: Camera Right
 * `→`: Camera Left
 * `Y`: Start/End Auto Orbit Revolution
+
+### FlyThroughCamera ONLY
+* `W`: Camera Up 
+* `S`: Camera Down
+* `A`: Camera Right
+* `D`: Camera Left
