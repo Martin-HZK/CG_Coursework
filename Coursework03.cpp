@@ -23,6 +23,11 @@ boolean isLightOn = true;
 bool isSelfRotateRing = false;
 float ringRotationAngle = 0.0f;
 
+float cone_scalar_factor = 1.0f;
+float torus_scalar_factor = 1.0f;
+float sphere_scalar_factor = 1.0f;
+float mars_scalar_factor = 1.0f;
+
 const float radius = 0.5f;
 const float height = 1.0f;
 const int segments_cone = 128;
@@ -418,6 +423,39 @@ void processKeyboard(GLFWwindow* window)
 		isAutoRotate = false;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS && isModelViewer)
+	{
+		cone_scalar_factor += 0.005f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS && isModelViewer)
+	{
+		cone_scalar_factor -= 0.005f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && isModelViewer)
+	{
+		torus_scalar_factor += 0.005f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && isModelViewer)
+	{
+		torus_scalar_factor -= 0.005f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && isModelViewer)
+	{
+		sphere_scalar_factor += 0.005f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && isModelViewer)
+	{
+		sphere_scalar_factor -= 0.005f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && isModelViewer)
+	{
+		mars_scalar_factor += 0.05f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && isModelViewer)
+	{
+		mars_scalar_factor -= 0.005f;
+	}
+
 
 
 
@@ -626,6 +664,7 @@ int main(int argc, char** argv)
 		glm::mat4 modelCone = glm::mat4(1.f);
 
 		modelCone = glm::rotate(modelCone, glm::radians(-30.0f), glm::vec3(.0f, .0f, 1.0f)); 
+		modelCone = glm::scale(modelCone, glm::vec3(cone_scalar_factor, cone_scalar_factor, cone_scalar_factor));
 		//modelCone = glm::rotate(modelCone, glm::radians(-40.0f), glm::vec3(.0f, 0.f, .0f));
 
 		//modelCone = modelCone * co_transformation;
@@ -644,7 +683,9 @@ int main(int argc, char** argv)
 
 		modelRing = glm::translate(modelRing, glm::vec3(.25f, .5f, 0.f)); // Translate the ring above the cone
 		modelRing = glm::rotate(modelRing, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(.0f, 1.f, 0.0f)); 
+		modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(.0f, 1.f, 0.0f));
+		modelRing = glm::scale(modelRing, glm::vec3(torus_scalar_factor, torus_scalar_factor, torus_scalar_factor));
+
 		//modelRing = glm::rotate(modelRing, glm::radians(-50.0f), glm::vec3(.0f, 0.0f, .0f)); 
 		//modelRing = glm::translate(modelRing, glm::vec3(.1f, -.3f, .0f)); // Translate the ring above the cone
 
@@ -660,6 +701,8 @@ int main(int argc, char** argv)
 		// Draw Sphere
 		glm::mat4 modelSphere = glm::mat4(1.f);
 		modelSphere = glm::translate(modelSphere, glm::vec3(0.1f, .7f, 0.f));
+		modelSphere = glm::scale(modelSphere, glm::vec3(sphere_scalar_factor, sphere_scalar_factor, sphere_scalar_factor));
+
 		//modelSphere = glm::rotate(modelSphere, glm::radians(-50.0f), glm::vec3(.0f, 0.0f, .0f));
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere));
 
@@ -672,6 +715,8 @@ int main(int argc, char** argv)
 		// Draw Mars
 		glm::mat4 modelSphere_1 = glm::mat4(1.f);
 		modelSphere_1 = glm::translate(modelSphere_1, glm::vec3(.0f, 1.f, .5f));
+		modelSphere_1 = glm::scale(modelSphere_1, glm::vec3(mars_scalar_factor, mars_scalar_factor, mars_scalar_factor));
+
 		//modelSphere_1 = glm::rotate(modelSphere_1, glm::radians(-50.0f), glm::vec3(.0f, 0.0f, .0f));
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelSphere_1));
 
@@ -694,7 +739,7 @@ int main(int argc, char** argv)
 		}
 		//std::cout << "The selfrotate state is: " << (int)isSelfRotateRing << std::endl;
 		if (isSelfRotateRing) {
-			ringRotationAngle += 0.01f; // 每帧增加旋转角度
+			ringRotationAngle += 0.01f;
 			modelRing = glm::rotate(modelRing, ringRotationAngle, glm::vec3(0.f, 1.f, 0.f));
 
 		}

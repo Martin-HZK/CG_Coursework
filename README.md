@@ -13,6 +13,11 @@
 * `V`: Change Camera Type to FlyThrough Camera
 * `N`: Turn off all the lights
 * `O`: Turn on all the lights
+* `J`: **Lockup**, which enables the composition operation
+  * `J` + `7` + `M`/`L`: Scaling up/down the Cone
+  * `J` + `8` + `M`/`L`: Scaling up the Ring
+  * `J` + `9` + `M`/`L`: Scaling up the Sphere
+  * `J` + `0` + `M`/`L`: Scaling up the Mars
 
 ### ModelViewerCamera ONLY
 * `↑`: Camera Up 
