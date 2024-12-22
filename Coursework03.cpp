@@ -411,8 +411,13 @@ void processKeyboard(GLFWwindow* window)
 	}
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
-		isAutoRotate = !isAutoRotate;
+		isAutoRotate = true;
 	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		isAutoRotate = false;
+	}
+
 
 
 

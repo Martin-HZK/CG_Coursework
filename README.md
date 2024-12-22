@@ -19,7 +19,8 @@
 * `↓`: Camera Down
 * `←`: Camera Right
 * `→`: Camera Left
-* `Y`: Start/End Auto Orbit Revolution
+* `Y`: Start Auto Orbit Revolution
+* `X`: Stop Auto Orbit Revolution
 
 ### FlyThroughCamera ONLY
 * `W`: Camera Up 
