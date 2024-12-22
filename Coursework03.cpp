@@ -359,7 +359,6 @@ void processKeyboard(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) {
 		isLightOn = true;
 	}
-	//std::cout << "The camera is: " << (int) isModelViewer << std::endl;
 	bool cam_changed = false;
 	float x = 0.f, y = 0.f;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && isModelViewer)
@@ -524,7 +523,6 @@ int main(int argc, char** argv)
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	int numMultiSamples;
 	glGetIntegerv(GL_MAX_SAMPLES, &numMultiSamples);
-	//std::cout << "Max number of samples is " << numMultiSamples << std::endl;
 
 	unsigned int shaderProgram = LoadShader("mvp.vert", "col.frag");
 
@@ -686,9 +684,6 @@ int main(int argc, char** argv)
 		modelRing = glm::rotate(modelRing, glm::radians(-30.0f), glm::vec3(.0f, 1.f, 0.0f));
 		modelRing = glm::scale(modelRing, glm::vec3(torus_scalar_factor, torus_scalar_factor, torus_scalar_factor));
 
-		//modelRing = glm::rotate(modelRing, glm::radians(-50.0f), glm::vec3(.0f, 0.0f, .0f)); 
-		//modelRing = glm::translate(modelRing, glm::vec3(.1f, -.3f, .0f)); // Translate the ring above the cone
-
 
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelRing));
 		glActiveTexture(GL_TEXTURE0);
@@ -733,17 +728,14 @@ int main(int argc, char** argv)
 		glm::mat4 projection = glm::mat4(1.f);
 		projection = glm::perspective(glm::radians(45.f), (float)800 / (float)600, .5f, 100.f);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//std::cout << "The auto state is: " << (int) isAutoRotate << std::endl;
 		if (isAutoRotate && isModelViewer) {
 			MoveAndOrientCamera(Camera, cube_pos, cam_dist, -.01f, 0.f);
 		}
-		//std::cout << "The selfrotate state is: " << (int)isSelfRotateRing << std::endl;
 		if (isSelfRotateRing) {
 			ringRotationAngle += 0.01f;
 			modelRing = glm::rotate(modelRing, ringRotationAngle, glm::vec3(0.f, 1.f, 0.f));
 
 		}
-		//modelRing = glm::rotate(modelRing, ringRotationAngle, glm::vec3(0.f, 1.f, 0.f));
 
 
 		glfwSwapBuffers(window);
